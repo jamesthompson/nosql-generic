@@ -1,0 +1,39 @@
+name:                nosql-generic
+version:             0.0.0.1
+synopsis:            Generics for nosql
+description:         Generically derived (de)serialization typeclasses for popular NoSQL databases
+homepage:            https://github.com/jamesthompson/nosql-generic
+license:             BSD3
+license-file:        LICENSE
+author:              James R. Thompson
+maintainer:          jamesthompsonoxford@gmail.com
+copyright:           Copyright (c) 2016, James R. Thompson
+category:            Data
+build-type:          Simple
+extra-source-files:
+    README.md
+  , stack.yaml
+  , LICENSE
+cabal-version:       >=1.10
+
+library
+  exposed-modules:
+      Data.Gogol.DatastoreEntity
+    , Data.Gogol.DatastoreInstances
+  other-extensions:
+      DefaultSignatures
+    , FlexibleContexts
+    , FlexibleInstances
+    , TypeFamilies
+    , TypeOperators
+  build-depends:       
+      base                 >=4.8      && <5
+    , bytestring           >=0.10.6.0 && <0.11
+    , gogol-datastore      >=0.1.0    && <0.2
+    , lens                 >=4.13     && <5
+    , semigroups           >=0.18.1   && <0.19
+    , text                 >=1.2.2.1  && <1.3
+    , time                 >=1.5.0.1  && <1.6
+    , unordered-containers >=0.2.7.1  && <0.3
+  hs-source-dirs:      src
+  default-language:    Haskell2010

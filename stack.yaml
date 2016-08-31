@@ -1,0 +1,9 @@
+flags: {}
+packages:
+- '.'
+extra-deps:
+- text1-0.0.3
+- gogol-0.1.0
+- gogol-core-0.1.0
+- gogol-datastore-0.1.0
+resolver: lts-6.12

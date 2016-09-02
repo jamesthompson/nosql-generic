@@ -189,8 +189,8 @@ instance DatastoreEntity a => DatastoreEntity (NonEmpty a) where
     where indiv x = case toEntity x of
             V v -> [v]
             _   -> []
-  fromEntity (V v) = do vals   <- v^?vArrayValue._Just.avValues
-                        parsed <- traverse fromEntity $ V <$> vals
+  fromEntity (V v) = do av     <- v^.vArrayValue
+                        parsed <- traverse fromEntity (V <$> av^.avValues)
                         return $ fromList parsed
   fromEntity _     = Nothing
 
@@ -198,10 +198,11 @@ instance DatastoreEntity a => DatastoreEntity [a] where
   toEntity xs = V $ value & vArrayValue ?~ (arrayValue & avValues .~
                                              (xs >>= indiv))
     where indiv x = case toEntity x of
-            V v -> [v]
-            _   -> []
-  fromEntity (V v) = do vals <- v^?vArrayValue._Just.avValues
-                        traverse fromEntity $ V <$> vals
+            V v              -> [v]
+            ec@(EntityC _ _) -> [value & vEntityValue .~ toEntity' ec]
+            _                -> []
+  fromEntity (V v) = do av <- v^.vArrayValue
+                        traverse fromEntity (V <$> av^.avValues)
   fromEntity _     = Nothing
 
 instance DatastoreEntity a => DatastoreEntity (Maybe a) where
@@ -212,10 +213,12 @@ instance DatastoreEntity a => DatastoreEntity (Maybe a) where
 
 _ToDatastoreEntity :: DatastoreEntity a => Getter a (Maybe Entity)
 _ToDatastoreEntity = L.to (toEntity' . toEntity)
-  where toEntity' (EntityC k params) =
-          pure $ entity & eKey ?~ (key & kPath .~ [pathElement & peKind ?~ k])
-                        & eProperties ?~ entityProperties (HM.fromList params)
-        toEntity' _                  = Nothing
+
+toEntity' :: EntityTransform -> Maybe Entity
+toEntity' (EntityC k params) =
+  pure $ entity & eKey ?~ (key & kPath .~ [pathElement & peKind ?~ k])
+                & eProperties ?~ entityProperties (HM.fromList params)
+toEntity' _                  = Nothing
 
 _FromDatastoreEntity :: DatastoreEntity a => Getter Entity (Maybe a)
 _FromDatastoreEntity = L.to (fromEntity . toTransform)

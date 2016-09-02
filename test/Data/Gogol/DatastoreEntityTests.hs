@@ -141,6 +141,37 @@ case_record_with_sum_type_field_forwards_backwards_serialization =
       res = exp^._ToDatastoreEntity >>= view _FromDatastoreEntity
   in res @?= Just exp
 
+data RecordTest8
+  = RecordTest8
+    { _v :: Text
+    , _w :: [Maybe RecordTest8]
+    } deriving (Eq, Show, Generic, DatastoreEntity)
+
+case_list_with_maybe_record_field_record_forwards_backwards_serialization_1 =
+  let exp = RecordTest8 "foo" []
+      res = exp^._ToDatastoreEntity >>= view _FromDatastoreEntity
+  in res @?= Just exp
+
+case_list_with_maybe_record_field_record_forwards_backwards_serialization_2 =
+  let exp = RecordTest8 "bar" [Nothing]
+      res = exp^._ToDatastoreEntity >>= view _FromDatastoreEntity
+  in res @?= Just exp
+
+case_list_with_maybe_record_field_record_forwards_backwards_serialization_3 =
+  let exp = RecordTest8 "bar" [pure $ RecordTest8 "baz" []]
+      res = exp^._ToDatastoreEntity >>= view _FromDatastoreEntity
+  in res @?= Just exp
+
+case_list_with_maybe_record_field_record_forwards_backwards_serialization_4 =
+  let exp = RecordTest8 "bar" [pure $ RecordTest8 "baz" [Nothing]]
+      res = exp^._ToDatastoreEntity >>= view _FromDatastoreEntity
+  in res @?= Just exp
+
+case_list_with_maybe_record_field_record_forwards_backwards_serialization_5 =
+  let exp = RecordTest8 "bar" [pure $ RecordTest8 "baz" [pure $ RecordTest8 "quux" []]]
+      res = exp^._ToDatastoreEntity >>= view _FromDatastoreEntity
+  in res @?= Just exp
+
 datastoreEntityTests :: TestTree
 datastoreEntityTests = $(testGroupGenerator)
 

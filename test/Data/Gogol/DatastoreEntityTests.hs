@@ -10,12 +10,19 @@ import           Data.Gogol.DatastoreEntity
 import           Data.Text                  (Text)
 import           GHC.Generics               (Generic)
 import           Network.Google.Datastore   (vStringValue, value)
-import           Test.QuickCheck            hiding (output)
-import           Test.QuickCheck.Property
-import           Test.Tasty
-import           Test.Tasty.HUnit
-import           Test.Tasty.QuickCheck      hiding (output)
+import           Test.Tasty                 (TestTree)
+import           Test.Tasty.HUnit           (testCase, (@?=))
 import           Test.Tasty.TH
+
+data SumTypeTest
+  = Sum1
+  | Sum2
+  deriving (Eq, Show, Generic, DatastoreEntity)
+
+case_sum_type_always_yields_nothing =
+  let exp = Nothing
+      res = Sum1^._ToDatastoreEntity
+  in res @?= exp
 
 data RecordTest1
   = RecordTest1

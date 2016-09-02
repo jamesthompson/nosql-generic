@@ -187,8 +187,9 @@ instance DatastoreEntity a => DatastoreEntity (NonEmpty a) where
   toEntity xs = V $ value & vArrayValue ?~ (arrayValue & avValues .~
                                              (toList xs >>= indiv))
     where indiv x = case toEntity x of
-            V v -> [v]
-            _   -> []
+            V v              -> [v]
+            ec@(EntityC _ _) -> [value & vEntityValue .~ toEntity' ec]
+            _                -> []
   fromEntity (V v) = do av     <- v^.vArrayValue
                         parsed <- traverse fromEntity (V <$> av^.avValues)
                         return $ fromList parsed

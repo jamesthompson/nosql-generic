@@ -179,6 +179,19 @@ case_list_with_maybe_record_field_record_forwards_backwards_serialization_5 =
       res = exp^._ToDatastoreEntity >>= view _FromDatastoreEntity
   in res @?= Just exp
 
+newtype Foo = Foo { _foo :: Text } deriving (Eq, Show, Generic, DatastoreEntity)
+
+data RecordTest9
+  = RecordTest9
+    { _x :: Text
+    , _y :: Foo
+    } deriving (Eq, Show, Generic, DatastoreEntity)
+
+case_newtypes_in_records_forwards_backwards_deserialization =
+  let exp = RecordTest9 "yo" (Foo "bar")
+      res = exp^._ToDatastoreEntity >>= view _FromDatastoreEntity
+  in res @?= Just exp
+
 datastoreEntityTests :: TestTree
 datastoreEntityTests = $(testGroupGenerator)
 

@@ -26,9 +26,11 @@ import           Data.Text                  (Text)
 import           GHC.Generics               (Generic)
 import           Network.Google.Datastore   (Entity)
 
+newtype Foo = Foo { _foo' :: Text } deriving (DatastoreEntity, Eq, Generic, Show)
+
 data MyType
   = MyConstructor
-    { _foo :: Text
+    { _foo :: Foo
     , _bar :: Bool
     , _baz :: Maybe MyType
     }
@@ -38,7 +40,7 @@ data MyType
   deriving (DatastoreEntity, Eq, Generic, Show)
 
 myType :: MyType
-myType = MyConstructor "hello" True Nothing
+myType = MyConstructor (Foo "hello") True Nothing
 
 myTypeAsEntity :: Maybe Entity
 myTypeAsEntity = myType^._ToDatastoreEntity
@@ -48,7 +50,7 @@ myType2 = MySndConstructor 3 ^._ToDatastoreEntity
 
 myType3RoundTrip :: Maybe Bool -- Evaluates to (Just True)
 myType3RoundTrup = do
-  let x = MyConstructor "yo" False (pure $ MySndConstructor 1)
+  let x = MyConstructor (Foo "yo") False (pure $ MySndConstructor 1)
   entity'' <- x^._ToDatastoreEntity
   x''      <- entity''^._FromDatastoreEntity
   -- forwards / backwards serialization -> deserialization from Gogol Datastore Entity type
